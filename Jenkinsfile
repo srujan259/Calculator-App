@@ -44,7 +44,7 @@ pipeline {
                     sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker stop calculator-app || true'"
                     sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker rm calculator-app || true'"
                     sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker pull ${DOCKER_REGISTRY}/${DOCKER_IMAGE_TAG}'"
-                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker run -d --name calculator-app -p 8080:8080 ${DOCKER_REGISTRY}/${DOCKER_IMAGE_TAG}'"
+                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker run -d --name calculator-app -p 30000:4567 ${DOCKER_REGISTRY}/${DOCKER_IMAGE_TAG}'"
                 }
             }
         }
