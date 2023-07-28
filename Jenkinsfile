@@ -39,11 +39,14 @@ pipeline {
         stage('Deploy to AWS EC2') {
             steps {
                 // Log in to the AWS EC2 instance using SSH and run the Docker container
-                sshagent(['AWS_PEM_KEY']) {
-                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker pull ${DOCKER_REGISTRY}/${DOCKER_IMAGE_LATEST}'"
-                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker stop calculator-app || true'"
-                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker rm calculator-app || true'"
-                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker run -d -p 4567:4567 --name calculator-app ${DOCKER_REGISTRY}/${DOCKER_IMAGE_LATEST}'"
+            steps {
+                // Log in to the AWS EC2 instance using SSH and run the Docker container
+                withCredentials([file(credentialsId: 'AWS_PEM_KEY', variable: 'AWS_PEM_KEY_FILE')]) {
+                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker login ${DOCKER_REGISTRY} -u ${DOCKER_HUB_CREDENTIALS_USR} -p ${DOCKER_HUB_CREDENTIALS_PSW}'"
+                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker stop calculator-app || true'"
+                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker rm calculator-app || true'"
+                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker pull ${DOCKER_REGISTRY}/${DOCKER_IMAGE_TAG}'"
+                    sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker run -d --name calculator-app -p 8080:8080 ${DOCKER_REGISTRY}/${DOCKER_IMAGE_TAG}'"
                 }
             }
         }
