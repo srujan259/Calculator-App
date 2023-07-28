@@ -39,8 +39,6 @@ pipeline {
         stage('Deploy to AWS EC2') {
             steps {
                 // Log in to the AWS EC2 instance using SSH and run the Docker container
-            steps {
-                // Log in to the AWS EC2 instance using SSH and run the Docker container
                 withCredentials([file(credentialsId: 'AWS_PEM_KEY', variable: 'AWS_PEM_KEY_FILE')]) {
                     sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker login ${DOCKER_REGISTRY} -u ${DOCKER_HUB_CREDENTIALS_USR} -p ${DOCKER_HUB_CREDENTIALS_PSW}'"
                     sh "ssh -o StrictHostKeyChecking=no -i ${AWS_PEM_KEY_FILE} ${REMOTE_USER}@${AWS_INSTANCE_IP} 'docker stop calculator-app || true'"
