@@ -8,18 +8,7 @@ pipeline {
         DOCKER_IMAGE_LATEST = "${DOCKER_IMAGE_NAME}:latest"
         DOCKER_HUB_CREDENTIALS = credentials('dockerhub')
         REMOTE_USER = 'ubuntu'
-        AWS_INSTANCE_IP = '16.170.141.2'
-    }
-
-    stages {
-        stage('Build') {
-            steps {
-                // Build the Maven project
-                sh 'mvn clean package'
-            }
-        }
-
-        stage('Docker Build & Push') {
+        AWS_INSTANCE_IP = '13.48.13.187'
             steps {
                 // Build the Docker image and tag it with the build number and "latest"
                 sh "docker build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE_TAG} ."
