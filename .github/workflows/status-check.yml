@@ -1,0 +1,42 @@
+name: Status Check Example
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check_status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Status Step
+        run: |
+          # Your validation or check commands here
+          # For example:
+          echo "Running tests..."
+          npm test
+
+      - name: Set Status Check
+        if: ${{ always() }}
+        uses: marvinpinto/action-automatic-rebase@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref }}
+
+      - name: Finalize Status Check
+        if: always()
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const status = 'success'; // You can set this based on your validation
+            const conclusion = (status === 'success') ? 'success' : 'failure';
+
+            await github.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.payload.pull_request.head.sha,
+              state: status,
+              description: 'Your status check description',
+              context: 'Your Status Check Name', // Replace with your status check name
+            });
